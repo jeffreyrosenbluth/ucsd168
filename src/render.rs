@@ -1,10 +1,15 @@
 use crate::geom::*;
 use crate::parse::*;
+use crate::scene::Material;
 use rayon::prelude::*;
 
 pub fn ray_color(ray: &Ray, world: &World) -> Color {
-    if let Some(_rec) = world.objects.hit(ray, 0.001, f32::MAX) {
-        color(0.85, 0.2, 0.2)
+    if let Some(rec) = world.objects.hit(ray, 0.001, f32::MAX) {
+        if let Material::Diffuse { r, g, b } = *rec.material {
+            color(r, g, b)
+        } else {
+            BLACK
+        }
     } else {
         BLACK
     }
@@ -15,11 +20,11 @@ fn write_color(data: &mut Vec<u8>, pixel_color: Color, samples_per_pixel: u32) {
     let mut g = pixel_color.y;
     let mut b = pixel_color.z;
 
-    // Divide the color by the number of samples.
     let scale = 1.0 / samples_per_pixel as Float;
-    r = (scale * r).sqrt();
-    g = (scale * g).sqrt();
-    b = (scale * b).sqrt();
+    // May want to gamma correct here.
+    r = scale * r;
+    g = scale * g;
+    b = scale * b;
 
     data.push((255.999 * r) as u8);
     data.push((255.999 * g) as u8);

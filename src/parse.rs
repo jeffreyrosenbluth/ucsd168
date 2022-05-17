@@ -1,10 +1,12 @@
 use crate::geom::*;
-use crate::scene::*;
 use crate::object::*;
+use crate::scene::*;
+use crate::sphere::Sphere;
 use crate::triangle::Triangle;
 use anyhow::{anyhow, Result};
 use std::fs;
 use std::path::PathBuf;
+use std::sync::Arc;
 
 #[derive(Debug)]
 pub struct World {
@@ -19,7 +21,7 @@ pub fn parse_scene(path: PathBuf) -> Result<World> {
     let mut objects = Objects(Vec::new());
     let mut lights = Vec::new();
     let mut camera = Camera::default();
-    let mut material = Material::default();
+    let mut material = Arc::new(Material::default());
     let mut _maxverts = 0;
     let mut vertices = Vec::new();
 
@@ -75,6 +77,8 @@ pub fn parse_scene(path: PathBuf) -> Result<World> {
                 let b = tokens[3].parse::<f32>()?;
 
                 lights.push(Light::Ambient { r, g, b });
+                // XXX TEMPORARY
+                material = Arc::new(Material::Diffuse { r, g, b })
             }
             "directional" => {
                 if tokens.len() != 7 {
@@ -116,7 +120,7 @@ pub fn parse_scene(path: PathBuf) -> Result<World> {
                 let r = tokens[1].parse::<f32>()?;
                 let g = tokens[2].parse::<f32>()?;
                 let b = tokens[3].parse::<f32>()?;
-                material = Material::Diffuse { r, g, b };
+                material = Arc::new(Material::Diffuse { r, g, b });
             }
             "specular" => {
                 if tokens.len() != 4 {
@@ -128,7 +132,7 @@ pub fn parse_scene(path: PathBuf) -> Result<World> {
                 let r = tokens[1].parse::<f32>()?;
                 let g = tokens[2].parse::<f32>()?;
                 let b = tokens[3].parse::<f32>()?;
-                material = Material::Specular { r, g, b };
+                material = Arc::new(Material::Specular { r, g, b });
             }
             "maxverts" => {
                 if tokens.len() != 2 {
@@ -161,12 +165,31 @@ pub fn parse_scene(path: PathBuf) -> Result<World> {
                 let x = tokens[1].parse::<usize>()?;
                 let y = tokens[2].parse::<usize>()?;
                 let z = tokens[3].parse::<usize>()?;
-                let triangle = Triangle::new(vertices[x], vertices[y], vertices[z]);
-                objects.0.push(Shape::Triangle(triangle, material.clone()));
+                let triangle =
+                    Triangle::new(vertices[x], vertices[y], vertices[z], material.clone());
+                objects.0.push(Shape::Triangle(triangle));
+            }
+            "sphere" => {
+                if tokens.len() != 5 {
+                    return Err(anyhow!(
+                        "tri command requires 4 arguments, not {}",
+                        tokens.len() - 1
+                    ));
+                };
+                let x = tokens[1].parse::<f32>()?;
+                let y = tokens[2].parse::<f32>()?;
+                let z = tokens[3].parse::<f32>()?;
+                let r = tokens[4].parse::<f32>()?;
+                let sphere = Sphere::new(point3(x, y, z), r, material.clone());
+                objects.0.push(Shape::Sphere(sphere));
             }
             _ => continue,
         }
     }
 
-    Ok(World {camera, objects, lights})
+    Ok(World {
+        camera,
+        objects,
+        lights,
+    })
 }

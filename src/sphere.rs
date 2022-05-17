@@ -1,15 +1,18 @@
 use crate::geom::{dot, Point3, Ray};
 use crate::object::HitRec;
+use crate::scene::Material;
+use std::sync::Arc;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct Sphere {
     pub center: Point3,
     pub radius: f32,
+    pub material: Arc<Material>
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f32) -> Self {
-        Self { center, radius }
+    pub fn new(center: Point3, radius: f32, material: Arc<Material>) -> Self {
+        Self { center, radius, material }
     }
 
     pub(crate) fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRec> {
@@ -33,6 +36,6 @@ impl Sphere {
             };
         }
         let p = r.at(root);
-        Some(HitRec::new(p, root))
+        Some(HitRec::new(p, root, self.material.clone()))
     }
 }
