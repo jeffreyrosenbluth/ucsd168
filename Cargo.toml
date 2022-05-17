@@ -1,0 +1,14 @@
+[package]
+name = "uscd168"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+png = "0.17.5"
+rand = {version = "0.8.5", features = ["small_rng"]}
+rayon = "1.5"
+noise = { git = "https://github.com/Razaekel/noise-rs.git", branch = "develop" }
+image = "0.24"
+anyhow = "1.0"
