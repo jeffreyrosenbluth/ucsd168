@@ -1,4 +1,5 @@
 use crate::geom::*;
+use glam::Vec3;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Camera {

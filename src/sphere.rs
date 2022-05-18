@@ -17,9 +17,9 @@ impl Sphere {
 
     pub(crate) fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRec> {
         let oc = r.origin - self.center;
-        let a = r.direction.length2();
+        let a = r.direction.length_squared();
         let half_b = dot(oc, r.direction);
-        let c = oc.length2() - self.radius * self.radius;
+        let c = oc.length_squared() - self.radius * self.radius;
 
         let discriminant = half_b * half_b - a * c;
         if discriminant < 0.0 {
