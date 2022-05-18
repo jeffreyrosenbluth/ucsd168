@@ -1,21 +1,32 @@
 use crate::geom::{dot, Point3, Ray};
 use crate::object::HitRec;
 use crate::scene::Material;
+use glam::Mat4;
 use std::sync::Arc;
 
 #[derive(Debug, Clone)]
 pub struct Sphere {
     pub center: Point3,
     pub radius: f32,
-    pub material: Arc<Material>
+    pub material: Arc<Material>,
+    pub transform: Mat4,
+    pub inv_transform: Mat4,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f32, material: Arc<Material>) -> Self {
-        Self { center, radius, material }
+    pub fn new(center: Point3, radius: f32, material: Arc<Material>, transform: Mat4) -> Self {
+        let inv_transform = transform.inverse();
+        Self {
+            center,
+            radius,
+            material,
+            transform,
+            inv_transform
+        }
     }
 
     pub(crate) fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRec> {
+        let r = r.transform(self.inv_transform);
         let oc = r.origin - self.center;
         let a = r.direction.length_squared();
         let half_b = dot(oc, r.direction);
@@ -27,7 +38,6 @@ impl Sphere {
         };
 
         let sqrtd = discriminant.sqrt();
-        // Find the nearest root that lies in the acceptable range.
         let mut root = (-half_b - sqrtd) / a;
         if root < t_min || t_max < root {
             root = (-half_b + sqrtd) / a;
@@ -36,6 +46,10 @@ impl Sphere {
             };
         }
         let p = r.at(root);
-        Some(HitRec::new(p, root, self.material.clone()))
+        Some(HitRec::new(
+            self.transform.transform_point3(p),
+            root,
+            self.material.clone(),
+        ))
     }
 }

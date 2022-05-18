@@ -5,7 +5,7 @@ use uscd168::io::write_png;
 
 pub fn main() {
     let world = parse_scene(PathBuf::from(
-        "/Users/jeffreyrosenbluth/Rust/uscd168/testscenes/scene2.test",
+        "/Users/jeffreyrosenbluth/Rust/uscd168/testscenes/scene3.test",
     )).unwrap();
     let data = render(&world);
     write_png(&data, world.camera.width as u32, world.camera.height as u32, "image")

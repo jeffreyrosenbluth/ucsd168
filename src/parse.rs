@@ -4,6 +4,7 @@ use crate::scene::*;
 use crate::sphere::Sphere;
 use crate::triangle::Triangle;
 use anyhow::{anyhow, Result};
+use glam::Mat4;
 use std::fs;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -24,6 +25,7 @@ pub fn parse_scene(path: PathBuf) -> Result<World> {
     let mut material = Arc::new(Material::default());
     let mut _maxverts = 0;
     let mut vertices = Vec::new();
+    let mut transforms: Vec<Mat4> = vec![Mat4::IDENTITY];
 
     let scene = fs::read_to_string(path)?;
     let lines = scene.lines();
@@ -165,8 +167,13 @@ pub fn parse_scene(path: PathBuf) -> Result<World> {
                 let x = tokens[1].parse::<usize>()?;
                 let y = tokens[2].parse::<usize>()?;
                 let z = tokens[3].parse::<usize>()?;
-                let triangle =
-                    Triangle::new(vertices[x], vertices[y], vertices[z], material.clone());
+                let triangle = Triangle::new(
+                    vertices[x],
+                    vertices[y],
+                    vertices[z],
+                    material.clone(),
+                    *transforms.last().unwrap(),
+                );
                 objects.0.push(Shape::Triangle(triangle));
             }
             "sphere" => {
@@ -180,8 +187,60 @@ pub fn parse_scene(path: PathBuf) -> Result<World> {
                 let y = tokens[2].parse::<f32>()?;
                 let z = tokens[3].parse::<f32>()?;
                 let r = tokens[4].parse::<f32>()?;
-                let sphere = Sphere::new(point3(x, y, z), r, material.clone());
+                let sphere = Sphere::new(
+                    point3(x, y, z),
+                    r,
+                    material.clone(),
+                    *transforms.last().unwrap(),
+                );
                 objects.0.push(Shape::Sphere(sphere));
+            }
+            "pushTransform" => transforms.push(*transforms.last().unwrap()),
+            "popTransform" => {
+                transforms.pop();
+            }
+            "translate" => {
+                if tokens.len() != 4 {
+                    return Err(anyhow!(
+                        "translate command requires 3 arguments, not {}",
+                        tokens.len() - 1
+                    ));
+                };
+                let x = tokens[1].parse::<f32>()?;
+                let y = tokens[2].parse::<f32>()?;
+                let z = tokens[3].parse::<f32>()?;
+                let mat = Mat4::from_translation(vec3(x, y, z));
+                let t = transforms.last_mut().unwrap();
+                *t *= mat;
+            }
+            "scale" => {
+                if tokens.len() != 4 {
+                    return Err(anyhow!(
+                        "scale command requires 3 arguments, not {}",
+                        tokens.len() - 1
+                    ));
+                };
+                let x = tokens[1].parse::<f32>()?;
+                let y = tokens[2].parse::<f32>()?;
+                let z = tokens[3].parse::<f32>()?;
+                let mat = Mat4::from_scale(vec3(x, y, z));
+                let t = transforms.last_mut().unwrap();
+                *t *= mat;
+            }
+            "rotate" => {
+                if tokens.len() != 5 {
+                    return Err(anyhow!(
+                        "rotate command requires 4 arguments, not {}",
+                        tokens.len() - 1
+                    ));
+                };
+                let x = tokens[1].parse::<f32>()?;
+                let y = tokens[2].parse::<f32>()?;
+                let z = tokens[3].parse::<f32>()?;
+                let a = tokens[4].parse::<f32>()?;
+                let mat = Mat4::from_axis_angle(vec3(x, y, z), degrees_to_radians(a));
+                let t = transforms.last_mut().unwrap();
+                *t *= mat;
             }
             _ => continue,
         }

@@ -46,6 +46,13 @@ impl Ray {
     pub fn at(&self, t: Float) -> Point3 {
         self.origin + t * self.direction
     }
+
+    pub fn transform(&self, mat: Mat4) -> Self {
+        let mut r = self.clone();
+        r.origin = mat.transform_point3(r.origin);
+        r.direction = mat.transform_vector3(r.direction);
+        r
+    }
 }
 
 pub fn dot(v: Vec3, w: Vec3) -> Float {
