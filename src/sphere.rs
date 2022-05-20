@@ -49,8 +49,8 @@ impl Sphere {
         Some(Hit::new(
             self.transform.transform_point3(p),
             root,
-            self.material.clone(),
             (p - self.center) / self.radius,
+            self.material.clone(),
         ))
     }
 }

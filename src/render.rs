@@ -6,24 +6,27 @@ use rayon::prelude::*;
 
 pub fn ray_color(ray: &Ray, world: &World) -> Color {
     if let Some(rec) = world.objects.hit(ray, 0.001, f32::MAX) {
-        intensity(&rec, world)
+        intensity(ray, &rec, world)
     } else {
         BLACK
     }
 }
 
-pub fn intensity(rec: &Hit, world: &World) -> Color {
+pub fn intensity(wi: &Ray, rec: &Hit, world: &World) -> Color {
     let mut color = BLACK;
     color += rec.material.emission;
     for light in &world.lights {
         match light {
             crate::scene::Light::Directional { x, y, z, r, g, b } => {
-                let direction = vec2(*x, *y, *z);
+                let direction = vec3(*x, *y, *z);
                 let ray = Ray::new(rec.point, direction);
+                let h = (wi.direction + direction) / 2.0;
                 let hit = world.objects.hit(&ray, 0.001, f32::MAX);
                 if hit.is_none() {
                     color += Color::new(*r, *g, *b)
-                        * rec.material.diffuse  * dot(rec.normal, ray).max(0.0) + dot(rec.material.specular, ) );
+                        * rec.material.diffuse
+                        * dot(rec.normal, direction).max(0.0)
+                        + rec.material.specular * dot(rec.normal, h).powf(rec.material.shininess);
                 }
             }
             crate::scene::Light::Point { x, y, z, r, g, b } => todo!(),
