@@ -1,19 +1,21 @@
 use crate::geom::{Point3, Ray};
-use crate::scene::Material;
+use glam::Vec3;
+use crate::material::Material;
 use crate::sphere::Sphere;
 use crate::triangle::Triangle;
 use std::sync::Arc;
 
 #[derive(Debug, Clone)]
-pub struct HitRec {
+pub struct Hit {
     pub point: Point3,
     pub t: f32,
+    pub normal: Vec3,
     pub material: Arc<Material>,
 }
 
-impl HitRec {
-    pub fn new(point: Point3, t: f32, material: Arc<Material>) -> Self {
-        Self { point, t, material }
+impl Hit {
+    pub fn new(point: Point3, t: f32, normal: Vec3, material: Arc<Material>) -> Self {
+        Self { point, t, material, normal }
     }
 }
 
@@ -24,7 +26,7 @@ pub enum Shape {
 }
 
 impl Shape {
-    pub fn hit(&self, ray: &Ray, t_min: f32, t_max: f32) -> Option<HitRec> {
+    pub fn hit(&self, ray: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
         match self {
             Shape::Sphere(s) => s.hit(ray, t_min, t_max),
             Shape::Triangle(t) => t.hit(ray, t_min, t_max),
@@ -36,7 +38,7 @@ impl Shape {
 pub struct Objects(pub Vec<Shape>);
 
 impl Objects {
-    pub fn hit(&self, ray: &Ray, t_min: f32, t_max: f32) -> Option<HitRec> {
+    pub fn hit(&self, ray: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
         let mut rec = None;
         let mut closest_so_far = t_max;
         for object in &self.0 {

@@ -65,11 +65,6 @@ impl Default for Camera {
 
 #[derive(Debug, Clone, Copy)]
 pub enum Light {
-    Ambient {
-        r: f32,
-        g: f32,
-        b: f32,
-    },
     Directional {
         x: f32,
         y: f32,
@@ -86,20 +81,4 @@ pub enum Light {
         g: f32,
         b: f32,
     },
-}
-
-#[derive(Debug, Clone, Copy)]
-pub enum Material {
-    Diffuse { r: f32, g: f32, b: f32 },
-    Specular { r: f32, g: f32, b: f32 },
-}
-
-impl Default for Material {
-    fn default() -> Self {
-        Material::Diffuse {
-            r: 0.0,
-            g: 0.0,
-            b: 0.0,
-        }
-    }
 }

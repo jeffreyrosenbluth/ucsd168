@@ -1,18 +1,35 @@
 use crate::geom::*;
+use crate::material::*;
+use crate::object::*;
 use crate::parse::*;
-use crate::scene::Material;
 use rayon::prelude::*;
 
 pub fn ray_color(ray: &Ray, world: &World) -> Color {
     if let Some(rec) = world.objects.hit(ray, 0.001, f32::MAX) {
-        if let Material::Diffuse { r, g, b } = *rec.material {
-            color(r, g, b)
-        } else {
-            BLACK
-        }
+        intensity(&rec, world)
     } else {
         BLACK
     }
+}
+
+pub fn intensity(rec: &Hit, world: &World) -> Color {
+    let mut color = BLACK;
+    color += rec.material.emission;
+    for light in &world.lights {
+        match light {
+            crate::scene::Light::Directional { x, y, z, r, g, b } => {
+                let direction = vec2(*x, *y, *z);
+                let ray = Ray::new(rec.point, direction);
+                let hit = world.objects.hit(&ray, 0.001, f32::MAX);
+                if hit.is_none() {
+                    color += Color::new(*r, *g, *b)
+                        * rec.material.diffuse  * dot(rec.normal, ray).max(0.0) + dot(rec.material.specular, ) );
+                }
+            }
+            crate::scene::Light::Point { x, y, z, r, g, b } => todo!(),
+        }
+    }
+    color
 }
 
 fn write_color(data: &mut Vec<u8>, pixel_color: Color, samples_per_pixel: u32) {

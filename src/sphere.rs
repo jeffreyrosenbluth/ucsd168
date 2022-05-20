@@ -1,6 +1,6 @@
 use crate::geom::{dot, Point3, Ray};
-use crate::object::HitRec;
-use crate::scene::Material;
+use crate::object::Hit;
+use crate::material::Material;
 use glam::Mat4;
 use std::sync::Arc;
 
@@ -25,7 +25,7 @@ impl Sphere {
         }
     }
 
-    pub(crate) fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRec> {
+    pub(crate) fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
         let r = r.transform(self.inv_transform);
         let oc = r.origin - self.center;
         let a = r.direction.length_squared();
@@ -46,10 +46,11 @@ impl Sphere {
             };
         }
         let p = r.at(root);
-        Some(HitRec::new(
+        Some(Hit::new(
             self.transform.transform_point3(p),
             root,
             self.material.clone(),
+            (p - self.center) / self.radius,
         ))
     }
 }

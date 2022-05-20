@@ -1,6 +1,6 @@
 use crate::geom::{cross, dot, Point3, Ray};
-use crate::object::HitRec;
-use crate::scene::Material;
+use crate::object::Hit;
+use crate::material::Material;
 use glam::Mat4;
 use std::sync::Arc;
 
@@ -33,7 +33,7 @@ impl Triangle {
         }
     }
 
-    pub(crate) fn hit(&self, ray: &Ray, t_min: f32, t_max: f32) -> Option<HitRec> {
+    pub(crate) fn hit(&self, ray: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
         let ray = ray.transform(self.inv_transform);
         const EPS1: f32 = 1e-7;
         const EPS2: f32 = 1e-10;
@@ -53,7 +53,7 @@ impl Triangle {
             None
         } else {
             let p = w1 * self.vertex1 + w2 * self.vertex2 + w3 * self.vertex3;
-            Some(HitRec::new(
+            Some(Hit::new(
                 self.transform.transform_point3(p),
                 t,
                 self.material.clone(),

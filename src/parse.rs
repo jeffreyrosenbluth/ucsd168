@@ -1,4 +1,5 @@
 use crate::geom::*;
+use crate::material::*;
 use crate::object::*;
 use crate::scene::*;
 use crate::sphere::Sphere;
@@ -14,15 +15,17 @@ pub struct World {
     pub camera: Camera,
     pub objects: Objects,
     pub lights: Vec<Light>,
+    pub ambient: Color,
 }
 
 pub fn parse_scene(path: PathBuf) -> Result<World> {
     let mut w = 0.0;
     let mut h = 0.0;
+    let mut ambient = BLACK;
     let mut objects = Objects(Vec::new());
     let mut lights = Vec::new();
     let mut camera = Camera::default();
-    let mut material = Arc::new(Material::default());
+    let mut material = Material::default();
     let mut _maxverts = 0;
     let mut vertices = Vec::new();
     let mut transforms: Vec<Mat4> = vec![Mat4::IDENTITY];
@@ -77,10 +80,9 @@ pub fn parse_scene(path: PathBuf) -> Result<World> {
                 let r = tokens[1].parse::<f32>()?;
                 let g = tokens[2].parse::<f32>()?;
                 let b = tokens[3].parse::<f32>()?;
+                ambient = Color::new(r, g, b);
 
-                lights.push(Light::Ambient { r, g, b });
-                // XXX TEMPORARY
-                material = Arc::new(Material::Diffuse { r, g, b })
+
             }
             "directional" => {
                 if tokens.len() != 7 {
@@ -122,7 +124,7 @@ pub fn parse_scene(path: PathBuf) -> Result<World> {
                 let r = tokens[1].parse::<f32>()?;
                 let g = tokens[2].parse::<f32>()?;
                 let b = tokens[3].parse::<f32>()?;
-                material = Arc::new(Material::Diffuse { r, g, b });
+                material.diffuse = Color::new(r, g, b);
             }
             "specular" => {
                 if tokens.len() != 4 {
@@ -134,7 +136,29 @@ pub fn parse_scene(path: PathBuf) -> Result<World> {
                 let r = tokens[1].parse::<f32>()?;
                 let g = tokens[2].parse::<f32>()?;
                 let b = tokens[3].parse::<f32>()?;
-                material = Arc::new(Material::Specular { r, g, b });
+                material.specular = Color::new(r, g, b);
+            }
+            "shininess" => {
+                if tokens.len() != 2 {
+                    return Err(anyhow!(
+                        "shininess command requires 1 arguments, not {}",
+                        tokens.len() - 1
+                    ));
+                };
+                let s = tokens[1].parse::<f32>()?;
+                material.shininess = s;
+            }
+            "emission" => {
+                if tokens.len() != 4 {
+                    return Err(anyhow!(
+                        "emission command requires 3 arguments, not {}",
+                        tokens.len() - 1
+                    ));
+                };
+                let r = tokens[1].parse::<f32>()?;
+                let g = tokens[2].parse::<f32>()?;
+                let b = tokens[3].parse::<f32>()?;
+                material.emission = Color::new(r, g, b);
             }
             "maxverts" => {
                 if tokens.len() != 2 {
@@ -171,7 +195,7 @@ pub fn parse_scene(path: PathBuf) -> Result<World> {
                     vertices[x],
                     vertices[y],
                     vertices[z],
-                    material.clone(),
+                    Arc::new(material.clone()),
                     *transforms.last().unwrap(),
                 );
                 objects.0.push(Shape::Triangle(triangle));
@@ -190,7 +214,7 @@ pub fn parse_scene(path: PathBuf) -> Result<World> {
                 let sphere = Sphere::new(
                     point3(x, y, z),
                     r,
-                    material.clone(),
+                    Arc::new(material.clone()),
                     *transforms.last().unwrap(),
                 );
                 objects.0.push(Shape::Sphere(sphere));
@@ -250,5 +274,6 @@ pub fn parse_scene(path: PathBuf) -> Result<World> {
         camera,
         objects,
         lights,
+        ambient,
     })
 }
