@@ -203,7 +203,7 @@ pub fn parse_scene(path: PathBuf) -> Result<World> {
             "sphere" => {
                 if tokens.len() != 5 {
                     return Err(anyhow!(
-                        "tri command requires 4 arguments, not {}",
+                        "sphere command requires 4 arguments, not {}",
                         tokens.len() - 1
                     ));
                 };

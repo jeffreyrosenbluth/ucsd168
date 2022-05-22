@@ -1,6 +1,6 @@
 use crate::geom::{cross, dot, Point3, Ray};
-use crate::object::Hit;
 use crate::material::Material;
+use crate::object::Hit;
 use glam::Mat4;
 use std::sync::Arc;
 
@@ -56,6 +56,10 @@ impl Triangle {
             Some(Hit::new(
                 self.transform.transform_point3(p),
                 t,
+                self.transform
+                    .inverse()
+                    .transpose()
+                    .transform_vector3(cross(e1, e2)),
                 self.material.clone(),
             ))
         }

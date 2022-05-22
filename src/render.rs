@@ -1,7 +1,7 @@
 use crate::geom::*;
-use crate::material::*;
 use crate::object::*;
 use crate::parse::*;
+use crate::scene::*;
 use rayon::prelude::*;
 
 pub fn ray_color(ray: &Ray, world: &World) -> Color {
@@ -14,22 +14,34 @@ pub fn ray_color(ray: &Ray, world: &World) -> Color {
 
 pub fn intensity(wi: &Ray, rec: &Hit, world: &World) -> Color {
     let mut color = BLACK;
-    color += rec.material.emission;
+    color += world.ambient + rec.material.emission;
     for light in &world.lights {
         match light {
-            crate::scene::Light::Directional { x, y, z, r, g, b } => {
+            Light::Directional { x, y, z, r, g, b } => {
                 let direction = vec3(*x, *y, *z);
                 let ray = Ray::new(rec.point, direction);
                 let h = (wi.direction + direction) / 2.0;
                 let hit = world.objects.hit(&ray, 0.001, f32::MAX);
-                if hit.is_none() {
+                if hit.is_none() || hit.unwrap().t > direction.length() {
                     color += Color::new(*r, *g, *b)
                         * rec.material.diffuse
-                        * dot(rec.normal, direction).max(0.0)
+                        * dot(rec.normal, direction.normalize()).max(0.0)
+                        + rec.material.specular * dot(rec.normal, h).powf(rec.material.shininess);
+                }
+            }   
+            Light::Point { x, y, z, r, g, b } => {
+                let light_position = point3(*x, *y, *z);
+                let direction = light_position - rec.point;
+                let ray = Ray::new(rec.point, direction.normalize());
+                let h = (wi.direction + direction.normalize()) / 2.0;
+                let hit = world.objects.hit(&ray, 0.001, f32::MAX);
+                if hit.is_none() || hit.unwrap().t > direction.length() {
+                    color += Color::new(*r, *g, *b)
+                        * rec.material.diffuse
+                        * dot(rec.normal, direction.normalize()).max(0.0)
                         + rec.material.specular * dot(rec.normal, h).powf(rec.material.shininess);
                 }
             }
-            crate::scene::Light::Point { x, y, z, r, g, b } => todo!(),
         }
     }
     color

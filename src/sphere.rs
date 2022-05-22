@@ -1,6 +1,6 @@
 use crate::geom::{dot, Point3, Ray};
-use crate::object::Hit;
 use crate::material::Material;
+use crate::object::Hit;
 use glam::Mat4;
 use std::sync::Arc;
 
@@ -21,7 +21,7 @@ impl Sphere {
             radius,
             material,
             transform,
-            inv_transform
+            inv_transform,
         }
     }
 
@@ -49,7 +49,10 @@ impl Sphere {
         Some(Hit::new(
             self.transform.transform_point3(p),
             root,
-            (p - self.center) / self.radius,
+            self.transform
+                .inverse()
+                .transpose()
+                .transform_vector3((p - self.center) / self.radius),
             self.material.clone(),
         ))
     }
