@@ -85,7 +85,6 @@ pub fn parse_scene(path: PathBuf) -> Result<World> {
 
             }
             "directional" => {
-                dbg!("what");
                 if tokens.len() != 7 {
                     return Err(anyhow!(
                         "directional command requires 6 arguments, not {}",
