@@ -1,7 +1,8 @@
 use crate::geom::*;
 use crate::object::*;
-use crate::parse::*;
+use crate::light::*;
 use crate::scene::*;
+use glam::vec3;
 use rayon::prelude::*;
 
 pub fn ray_color(ray: &Ray, world: &World) -> Color {
@@ -20,7 +21,7 @@ pub fn intensity(wi: &Ray, rec: &Hit, world: &World) -> Color {
             Light::Directional { x, y, z, r, g, b } => {
                 let light_vector = -vec3(*x, *y, *z);
                 let light_direction = light_vector.normalize();
-                let light_ray = Ray::new(rec.point, light_direction);
+                let light_ray = Ray::new(rec.point, light_vector);
                 let h = ((wi.origin - rec.point) + light_vector).normalize();
                 let hit = world.objects.hit(&light_ray, 0.001, f32::MAX);
                 if hit.is_none() {
@@ -35,7 +36,7 @@ pub fn intensity(wi: &Ray, rec: &Hit, world: &World) -> Color {
                 let light_position = point3(*x, *y, *z);
                 let light_vector = light_position - rec.point;
                 let light_direction = light_vector.normalize();
-                let light_ray = Ray::new(rec.point, light_direction);
+                let light_ray = Ray::new(rec.point, light_vector);
                 let h = ((wi.origin - rec.point) + light_vector).normalize();
                 let hit = world.objects.hit(&light_ray, 0.001, f32::MAX);
                 if hit.is_none() || hit.unwrap().t > light_vector.length() {
@@ -57,7 +58,7 @@ fn write_color(data: &mut Vec<u8>, pixel_color: Color, samples_per_pixel: u32) {
     let mut g = pixel_color.y;
     let mut b = pixel_color.z;
 
-    let scale = 1.0 / samples_per_pixel as Float;
+    let scale = 1.0 / samples_per_pixel as f32;
     // May want to gamma correct here.
     r = scale * r;
     g = scale * g;

@@ -1,8 +1,8 @@
 use crate::geom::{Point3, Ray};
-use glam::Vec3;
 use crate::material::Material;
-use crate::sphere::Sphere;
-use crate::triangle::Triangle;
+use crate::shapes::sphere::Sphere;
+use crate::shapes::triangle::Triangle;
+use glam::Vec3;
 use std::sync::Arc;
 
 #[derive(Debug, Clone)]
@@ -15,7 +15,12 @@ pub struct Hit {
 
 impl Hit {
     pub fn new(point: Point3, t: f32, normal: Vec3, material: Arc<Material>) -> Self {
-        Self { point, t, material, normal }
+        Self {
+            point,
+            t,
+            material,
+            normal,
+        }
     }
 }
 
@@ -48,5 +53,11 @@ impl Objects {
             }
         }
         rec
+    }
+}
+
+impl Default for Objects {
+    fn default() -> Self {
+        Self(Vec::new())
     }
 }

@@ -1,9 +1,12 @@
+pub mod aabb;
+pub mod camera;
+pub mod edsl;
 pub mod geom;
 pub mod io;
+pub mod light;
+pub mod material;
 pub mod object;
 pub mod parse;
 pub mod render;
 pub mod scene;
-pub mod sphere;
-pub mod triangle;
-pub mod material;
+pub mod shapes;

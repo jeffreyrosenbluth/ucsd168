@@ -1,22 +1,16 @@
+use crate::camera::*;
 use crate::geom::*;
+use crate::light::*;
 use crate::material::*;
 use crate::object::*;
 use crate::scene::*;
-use crate::sphere::Sphere;
-use crate::triangle::Triangle;
+use crate::shapes::sphere::Sphere;
+use crate::shapes::triangle::Triangle;
 use anyhow::{anyhow, Result};
-use glam::Mat4;
+use glam::{vec3, Mat4};
 use std::fs;
 use std::path::PathBuf;
 use std::sync::Arc;
-
-#[derive(Debug)]
-pub struct World {
-    pub camera: Camera,
-    pub objects: Objects,
-    pub lights: Vec<Light>,
-    pub ambient: Color,
-}
 
 pub fn parse_scene(path: PathBuf) -> Result<World> {
     let mut w = 0.0;
@@ -81,8 +75,6 @@ pub fn parse_scene(path: PathBuf) -> Result<World> {
                 let g = tokens[2].parse::<f32>()?;
                 let b = tokens[3].parse::<f32>()?;
                 ambient = Color::new(r, g, b);
-
-
             }
             "directional" => {
                 if tokens.len() != 7 {
