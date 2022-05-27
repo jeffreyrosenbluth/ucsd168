@@ -33,8 +33,8 @@ pub fn scene_1() -> World {
     scene.sphere(0.0, -1.0, -4.0, 1.0);
     scene.push();
     scene.scale(0.3, 0.15, 0.15);
-    scene.rotate_y(20.0);
-    scene.translate(0.0, 1.0, -4.0);
+    scene.rotate(0.0, 1.0, 1.0, 45.0);
+    scene.translate(0.0, 0.5, -4.0);
     scene.sphere(0.0, 0.0, 0.0, 1.0);
     scene.pop();
     scene.push();
