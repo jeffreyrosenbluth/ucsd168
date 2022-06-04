@@ -5,51 +5,57 @@ use crate::scene::*;
 use glam::vec3;
 use rayon::prelude::*;
 
-pub fn ray_color(ray: &Ray, world: &World) -> Color {
+pub fn ray_color(ray: &Ray, world: &World, depth: i32) -> Color {
+    if depth >= world.max_depth {
+        return BLACK;
+    }
     if let Some(rec) = world.objects.hit(ray, 0.001, f32::MAX) {
-        intensity(ray, &rec, world)
+        intensity(ray, &rec, world, depth)
     } else {
         BLACK
     }
 }
 
-pub fn intensity(wi: &Ray, rec: &Hit, world: &World) -> Color {
-    let mut color = BLACK;
-    color += world.ambient + rec.material.emission;
+pub fn intensity(wi: &Ray, rec: &Hit, world: &World, depth: i32) -> Color {
+    let mut color = world.ambient + rec.material.emission;
     for light in &world.lights {
         match light {
             Light::Directional { x, y, z, r, g, b } => {
                 let light_vector = -vec3(*x, *y, *z);
                 let light_direction = light_vector.normalize();
-                let light_ray = Ray::new(rec.point, light_vector);
+                let light_ray = Ray::new(rec.point, light_direction);
                 let h = ((wi.origin - rec.point) + light_vector).normalize();
                 let hit = world.objects.hit(&light_ray, 0.001, f32::MAX);
                 if hit.is_none() {
                     color += Color::new(*r, *g, *b)
                         * rec.material.diffuse
-                        * dot(rec.normal, -light_direction).max(0.0)
+                        * dot(rec.normal, light_direction).max(0.0)
                         + rec.material.specular
-                            * dot(rec.normal, h).max(0.0).powf(rec.material.shininess)
+                            * dot(rec.normal, h).max(0.0).powf(rec.material.shininess);
                 }
             }
             Light::Point { x, y, z, r, g, b } => {
                 let light_position = point3(*x, *y, *z);
                 let light_vector = light_position - rec.point;
                 let light_direction = light_vector.normalize();
-                let light_ray = Ray::new(rec.point, light_vector);
+                let light_ray = Ray::new(rec.point, light_direction);
                 let h = ((wi.origin - rec.point) + light_vector).normalize();
                 let hit = world.objects.hit(&light_ray, 0.001, f32::MAX);
                 if hit.is_none() || hit.unwrap().t > light_vector.length() {
+                    let [c, l, q] = world.attenuation;
+                    let a = c + l * light_vector.length() + q * light_vector.length_squared();
                     color += (Color::new(*r, *g, *b)
                         * rec.material.diffuse
                         * dot(rec.normal, light_direction).max(0.0)
                         + rec.material.specular
                             * dot(rec.normal, h).max(0.0).powf(rec.material.shininess))
-                        / light_vector.length_squared();
+                        / a;
                 }
             }
         }
     }
+    let reflected_ray = Ray::new(rec.point, reflect(wi.direction, rec.normal));
+    color += rec.material.specular * ray_color(&reflected_ray, world, depth + 1);
     color
 }
 
@@ -81,7 +87,7 @@ pub fn render(environment: &World) -> Vec<u8> {
             .map(|i| {
                 let mut pixel_color = BLACK;
                 let r = environment.camera.get_ray(j as f32, i as f32);
-                let mut rc = ray_color(&r, environment);
+                let mut rc = ray_color(&r, environment, 0);
                 if rc.x.is_nan() {
                     rc.x = 0.0
                 };

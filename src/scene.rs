@@ -9,4 +9,6 @@ pub struct World {
     pub objects: Objects,
     pub lights: Vec<Light>,
     pub ambient: Color,
+    pub attenuation: [f32; 3],
+    pub max_depth: i32,
 }

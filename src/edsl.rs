@@ -19,6 +19,8 @@ pub struct Edsl {
     pub transforms: Vec<Mat4>,
     pub vertices: Vec<Vec3>,
     pub current_material: Material,
+    pub attenuation: [f32; 3],
+    pub max_depth: i32,
 }
 
 impl Edsl {
@@ -32,6 +34,8 @@ impl Edsl {
         transforms: Vec<Mat4>,
         vertices: Vec<Vec3>,
         current_material: Material,
+        attenuation: [f32; 3],
+        max_depth: i32,
     ) -> Self {
         Self {
             width,
@@ -43,12 +47,18 @@ impl Edsl {
             transforms,
             vertices,
             current_material,
+            attenuation,
+            max_depth,
         }
     }
 
     pub fn size(&mut self, w: f32, h: f32) {
         self.width = w;
         self.height = h;
+    }
+
+    pub fn max_depth(&mut self, d: i32) {
+        self.max_depth = d;
     }
 
     pub fn camera(&mut self, look_from: Point3, look_at: Point3, up: Point3, fov: f32) {
@@ -70,6 +80,10 @@ impl Edsl {
 
     pub fn diffuse(&mut self, r: f32, g: f32, b: f32) {
         self.current_material.diffuse = Color::new(r, g, b);
+    }
+
+    pub fn attenuation(&mut self, c: f32, l: f32, q: f32) {
+        self.attenuation = [c, l, q];
     }
 
     pub fn specular(&mut self, r: f32, g: f32, b: f32) {
@@ -140,13 +154,12 @@ impl Edsl {
         let t = self.transforms.last_mut().unwrap();
         *t = mat * *t;
     }
-    
+
     pub fn rotate_y(&mut self, a: f32) {
         let mat = Mat4::from_rotation_y(degrees_to_radians(a));
         let t = self.transforms.last_mut().unwrap();
         *t = mat * *t;
     }
-
 
     pub fn rotate_z(&mut self, a: f32) {
         let mat = Mat4::from_rotation_z(degrees_to_radians(a));
@@ -160,6 +173,8 @@ impl Edsl {
             objects: self.objects,
             lights: self.lights,
             ambient: self.ambient,
+            attenuation: self.attenuation,
+            max_depth: self.max_depth,
         }
     }
 }
@@ -177,6 +192,8 @@ impl Default for Edsl {
             transforms: vec![Mat4::IDENTITY],
             vertices: Default::default(),
             current_material: Default::default(),
+            attenuation: [1.0, 0.0, 0.0],
+            max_depth: 5,
         }
     }
 }

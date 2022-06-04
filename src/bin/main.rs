@@ -1,14 +1,14 @@
+use std::path::PathBuf;
 use ucsd168::edsl::Edsl;
 use ucsd168::geom::point3;
 use ucsd168::io::write_png;
+use ucsd168::parse::*;
 use ucsd168::render::*;
 use ucsd168::scene::World;
-use ucsd168::parse::*;
-use std::path::PathBuf;
 
 pub fn main() {
     let world = parse_scene(PathBuf::from(
-        "/Users/jeffreyrosenbluth/Rust/ucsd168/testscenes/scene4.test",
+        "/Users/jeffreyrosenbluth/Develop/ucsd168/testscenes/scene7.test",
     ))
     .unwrap();
     // let world = scene_1();

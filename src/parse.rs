@@ -23,6 +23,8 @@ pub fn parse_scene(path: PathBuf) -> Result<World> {
     let mut _maxverts = 0;
     let mut vertices = Vec::new();
     let mut transforms: Vec<Mat4> = vec![Mat4::IDENTITY];
+    let mut attenuation = [1.0, 0.0, 0.0];
+    let mut max_depth = 5;
 
     let scene = fs::read_to_string(path)?;
     let lines = scene.lines();
@@ -41,6 +43,15 @@ pub fn parse_scene(path: PathBuf) -> Result<World> {
                 };
                 w = tokens[1].parse::<f32>()?;
                 h = tokens[2].parse::<f32>()?;
+            }
+            "maxdepth" => {
+                if tokens.len() != 2 {
+                    return Err(anyhow!(
+                        "size command requires 1 arguments, not {}",
+                        tokens.len() - 1
+                    ));
+                };
+                max_depth = tokens[1].parse::<i32>()?;
             }
             "camera" => {
                 if tokens.len() != 11 {
@@ -105,6 +116,18 @@ pub fn parse_scene(path: PathBuf) -> Result<World> {
                 let g = tokens[5].parse::<f32>()?;
                 let b = tokens[6].parse::<f32>()?;
                 lights.push(Light::Point { x, y, z, r, g, b });
+            }
+            "attenuation" => {
+                if tokens.len() != 4 {
+                    return Err(anyhow!(
+                        "attenuation command requires 3 arguments, not {}",
+                        tokens.len() - 1
+                    ));
+                };
+                let c = tokens[1].parse::<f32>()?;
+                let l = tokens[2].parse::<f32>()?;
+                let q = tokens[3].parse::<f32>()?;
+                attenuation = [c, l, q];
             }
             "diffuse" => {
                 if tokens.len() != 4 {
@@ -267,5 +290,7 @@ pub fn parse_scene(path: PathBuf) -> Result<World> {
         objects,
         lights,
         ambient,
+        attenuation,
+        max_depth,
     })
 }
