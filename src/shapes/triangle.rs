@@ -53,12 +53,11 @@ impl Triangle {
             None
         } else {
             let p = w1 * self.vertex1 + w2 * self.vertex2 + w3 * self.vertex3;
+            let n = self.inv_transform.transpose().transform_vector3(cross(e1, e2)); 
             Some(Hit::new(
                 self.transform.transform_point3(p),
                 t,
-                self.inv_transform
-                    .transpose()
-                    .transform_vector3(cross(e1, e2)),
+                n.normalize(),
                 self.material.clone(),
             ))
         }

@@ -1,6 +1,6 @@
 use crate::geom::*;
-use crate::object::*;
 use crate::light::*;
+use crate::object::*;
 use crate::scene::*;
 use glam::vec3;
 use rayon::prelude::*;
@@ -27,7 +27,7 @@ pub fn intensity(wi: &Ray, rec: &Hit, world: &World) -> Color {
                 if hit.is_none() {
                     color += Color::new(*r, *g, *b)
                         * rec.material.diffuse
-                        * dot(rec.normal, light_direction).max(0.0)
+                        * dot(rec.normal, -light_direction).max(0.0)
                         + rec.material.specular
                             * dot(rec.normal, h).max(0.0).powf(rec.material.shininess)
                 }

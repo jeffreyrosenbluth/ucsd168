@@ -7,19 +7,20 @@ size 640 480
 # This file has 4 camera positions.  Render your scene for all 4.
 
 #camera 0 0 4 0 0 0 0 1 0 30
-#camera 0 -3 3 0 0 0 0 1 0 30
+camera 0 -3 3 0 0 0 0 1 0 30
 #camera -4 0 1 0 0 1 0 0 1 45
-camera -4 -4 4 1 0 0 0 1 0 30
+#camera -4 -4 4 1 0 0 0 1 0 30
 
 # lighting/material definitions
 # for initial testing, you should get the geometry right
 # you may want to use dummy (constant) shading, ignoring these lines
 
-ambient .1 .1 .1
-directional 0 0 1 .5 .5 .5 
-point 4 0 4 .5 .5 .5
-diffuse 1 0 0 
-specular 0 0 0
+ambient 0 0 0
+directional 0 0 1 1 1 1
+point 4 0 4 10 10 10
+diffuse .7 .7 .2 
+specular 1 1 1
+shininess 5
 
 # Now specify the geometry 
 # Again, for initial testing, maybe you want to implement a dummy 
@@ -34,6 +35,25 @@ vertex +1 -1 0
 vertex +1 +1 0
 vertex -1 +1 0
 
+pushTransform
+
+rotate 0 0 1 20
+scale 1.0 0.5 0.5
+translate 0.5 0 -1
+
 tri 0 1 2
 tri 0 2 3
+
+popTransform
+pushTransform
+
+rotate 0 0 1 20
+scale 0.5 0.5 0.5
+translate -1 1 -1
+
+tri 0 1 2
+tri 0 2 3
+
+popTransform
+pushTransform
 

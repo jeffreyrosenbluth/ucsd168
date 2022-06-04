@@ -3,9 +3,15 @@ use ucsd168::geom::point3;
 use ucsd168::io::write_png;
 use ucsd168::render::*;
 use ucsd168::scene::World;
+use ucsd168::parse::*;
+use std::path::PathBuf;
 
 pub fn main() {
-    let world = scene_1();
+    let world = parse_scene(PathBuf::from(
+        "/Users/jeffreyrosenbluth/Rust/ucsd168/testscenes/scene4.test",
+    ))
+    .unwrap();
+    // let world = scene_1();
     let data = render(&world);
     write_png(
         &data,
