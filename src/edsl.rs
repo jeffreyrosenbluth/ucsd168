@@ -168,7 +168,7 @@ impl Edsl {
     }
 
     pub fn run(self) -> World {
-        let indices: Vec<usize> = (0..self.objects.0.len()).collect();
+        let indices: Vec<usize> = (0..self.objects.len()).collect();
         let nodes = Node::new(&self.objects, indices, 0);
         World {
             camera: self.camera,

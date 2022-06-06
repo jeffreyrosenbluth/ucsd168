@@ -284,7 +284,7 @@ pub fn parse_scene<'a>(path: PathBuf) -> Result<World> {
             _ => continue,
         }
     }
-    let indices: Vec<usize> = (0..objects.0.len()).collect();
+    let indices: Vec<usize> = (0..objects.len()).collect();
     let nodes = Node::new(&objects, indices, 0);
 
     Ok(World {

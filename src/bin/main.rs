@@ -13,7 +13,7 @@ pub fn main() {
     .unwrap();
     println!("World loaded");
     // let world = scene_1();
-    let data = render(&world);
+    let data = render(&world, gl_integrator);
     write_png(
         &data,
         world.camera.width as u32,

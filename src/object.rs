@@ -76,6 +76,10 @@ impl Objects {
             surrounding_box(acc, b)
         })
     }
+
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
 }
 
 impl Index<usize> for Objects {
