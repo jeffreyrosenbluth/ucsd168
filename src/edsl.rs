@@ -1,13 +1,12 @@
-use crate::bvh::*;
-use crate::camera::*;
-use crate::geom::*;
-use crate::light::*;
+use crate::bvh::Node;
+use crate::camera::Camera;
+use crate::geom::{degrees_to_radians, point3, vec3, Color, Mat4, Point3, Vec3};
+use crate::light::Light;
 use crate::material::Material;
-use crate::object::*;
-use crate::scene::*;
+use crate::object::{Objects, Shape};
+use crate::scene::World;
 use crate::shapes::sphere::Sphere;
 use crate::shapes::triangle::Triangle;
-use glam::*;
 use std::sync::Arc;
 
 pub struct Edsl {

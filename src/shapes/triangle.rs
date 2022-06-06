@@ -1,8 +1,7 @@
 use crate::aabb::Aabb;
-use crate::geom::{cross, dot, Point3, Ray};
+use crate::geom::{cross, dot, vec3, Mat4, Point3, Ray};
 use crate::material::Material;
 use crate::object::Hit;
-use glam::{vec3, Mat4};
 use std::sync::Arc;
 
 #[derive(Debug, Clone)]

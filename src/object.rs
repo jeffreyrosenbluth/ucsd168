@@ -1,10 +1,8 @@
 use crate::aabb::{surrounding_box, Aabb};
-use crate::geom::{Point3, Ray};
+use crate::geom::{Point3, Ray, Vec3};
 use crate::material::Material;
 use crate::shapes::sphere::Sphere;
 use crate::shapes::triangle::Triangle;
-use glam::Vec3;
-use std::cmp::Ordering;
 use std::ops::Index;
 use std::sync::Arc;
 
@@ -47,18 +45,6 @@ impl Shape {
             Shape::Triangle(t) => t.bounding_box,
         }
     }
-
-    pub fn compare(&self, other: &Self, axis: usize) -> Ordering {
-        let x = self.bounding_box().box_min[axis];
-        let y = other.bounding_box().box_min[axis];
-        if x < y {
-            Ordering::Less
-        } else if x > y {
-            Ordering::Greater
-        } else {
-            Ordering::Equal
-        }
-    }
 }
 
 impl Default for Shape {
@@ -89,25 +75,6 @@ impl Objects {
             let b = o.bounding_box();
             surrounding_box(acc, b)
         })
-    }
-
-    pub fn compare(&self, other: &Self, axis: usize) -> Ordering {
-        let x = self.bounding_box().box_min[axis];
-        let y = other.bounding_box().box_min[axis];
-        if x < y {
-            Ordering::Less
-        } else if x > y {
-            Ordering::Greater
-        } else {
-            Ordering::Equal
-        }
-    }
-
-    pub fn mean(&self, axis: usize) -> f32 {
-        self.0
-            .iter()
-            .fold(0.0, |acc, s| acc + s.bounding_box().box_min[axis])
-            / self.0.len() as f32
     }
 }
 

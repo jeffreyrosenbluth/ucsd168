@@ -1,5 +1,4 @@
-use crate::geom::*;
-use glam::Vec3;
+use crate::geom::{cross, degrees_to_radians, point3, Point3, Ray, Vec3};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Camera {

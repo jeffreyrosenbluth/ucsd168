@@ -1,6 +1,6 @@
 use crate::bvh::Node;
 use crate::camera::Camera;
-use crate::geom::*;
+use crate::geom::Color;
 use crate::light::Light;
 use crate::object::Objects;
 

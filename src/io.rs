@@ -1,4 +1,4 @@
-use png::*;
+use png::{BitDepth, ColorType, Encoder};
 use std::fs::File;
 use std::io::BufWriter;
 use std::io::Write;

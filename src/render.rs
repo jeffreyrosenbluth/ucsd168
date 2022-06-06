@@ -1,8 +1,7 @@
-use crate::geom::*;
-use crate::light::*;
-use crate::object::*;
-use crate::scene::*;
-use glam::vec3;
+use crate::geom::{dot, point3, reflect, vec3, Color, Ray, BLACK};
+use crate::light::Light;
+use crate::object::Hit;
+use crate::scene::World;
 use rayon::prelude::*;
 
 pub fn ray_color(ray: &Ray, world: &World, depth: i32) -> Color {

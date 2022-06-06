@@ -1,9 +1,5 @@
 use crate::geom::*;
-use crate::material::Material;
-use crate::object::Hit;
-use glam::Vec3;
 use std::cmp::Ordering;
-use std::sync::Arc;
 
 #[derive(Copy, Clone, Debug)]
 pub struct Aabb {

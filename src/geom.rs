@@ -1,5 +1,5 @@
+pub use glam::*;
 use rand::Rng;
-use glam::*;
 
 pub const INFINITY: f32 = std::f32::MAX;
 pub const PI: f32 = std::f32::consts::PI;
@@ -9,7 +9,6 @@ pub type Color = Vec3;
 
 pub const BLACK: Color = Vec3::ZERO;
 pub const WHITE: Color = Vec3::ONE;
-
 
 pub fn degrees_to_radians(degrees: f32) -> f32 {
     degrees * PI / 180.0
@@ -31,10 +30,7 @@ pub struct Ray {
 
 impl Ray {
     pub fn new(origin: Point3, direction: Vec3) -> Self {
-        Self {
-            origin,
-            direction,
-        }
+        Self { origin, direction }
     }
 
     pub fn at(&self, t: f32) -> Point3 {
