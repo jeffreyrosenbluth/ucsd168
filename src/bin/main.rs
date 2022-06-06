@@ -8,7 +8,7 @@ use ucsd168::scene::World;
 
 pub fn main() {
     let world = parse_scene(PathBuf::from(
-        "/Users/jeffreyrosenbluth/Develop/ucsd168/testscenes/scene7.test",
+        "/Users/jeffreyrosenbluth/Develop/ucsd168/testscenes/scene6.test",
     ))
     .unwrap();
     println!("World loaded");

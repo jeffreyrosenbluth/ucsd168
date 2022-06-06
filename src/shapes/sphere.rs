@@ -2,7 +2,7 @@ use crate::aabb::Aabb;
 use crate::geom::{dot, Point3, Ray};
 use crate::material::Material;
 use crate::object::Hit;
-use glam::{vec3, Mat4};
+use glam::{vec3, Mat4, Vec3};
 use std::sync::Arc;
 
 #[derive(Debug, Clone)]
@@ -65,6 +65,17 @@ impl Sphere {
         Aabb::new(
             vec3(-radius, -radius, -radius),
             vec3(radius, radius, radius),
+        )
+    }
+}
+
+impl Default for Sphere {
+    fn default() -> Self {
+        Sphere::new(
+            Vec3::ZERO,
+            1.0,
+            Arc::new(Material::default()),
+            Mat4::IDENTITY,
         )
     }
 }

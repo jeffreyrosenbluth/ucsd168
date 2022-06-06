@@ -5,6 +5,7 @@ use crate::shapes::sphere::Sphere;
 use crate::shapes::triangle::Triangle;
 use glam::Vec3;
 use std::cmp::Ordering;
+use std::ops::Index;
 use std::sync::Arc;
 
 #[derive(Debug, Clone)]
@@ -60,6 +61,12 @@ impl Shape {
     }
 }
 
+impl Default for Shape {
+    fn default() -> Self {
+        Self::Sphere(Sphere::default())
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct Objects(pub Vec<Shape>);
 
@@ -94,6 +101,21 @@ impl Objects {
         } else {
             Ordering::Equal
         }
+    }
+
+    pub fn mean(&self, axis: usize) -> f32 {
+        self.0
+            .iter()
+            .fold(0.0, |acc, s| acc + s.bounding_box().box_min[axis])
+            / self.0.len() as f32
+    }
+}
+
+impl Index<usize> for Objects {
+    type Output = Shape;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.0[index]
     }
 }
 

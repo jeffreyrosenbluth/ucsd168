@@ -16,7 +16,7 @@ impl Aabb {
         Self { box_min, box_max }
     }
 
-    pub fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit> {
+    pub fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> bool {
         let mut t = t_max;
         for a in 0..3 {
             let inv_d = 1.0 / r.direction[a];
@@ -28,18 +28,13 @@ impl Aabb {
             let t_min = if t0 > t_min { t0 } else { t_min };
             let t_max = if t1 < t_max { t1 } else { t_max };
             if t_max <= t_min {
-                return None;
+                return false;
             }
             if t_min < t {
                 t = t_min
             };
         }
-        Some(Hit::new(
-            r.at(t),
-            t,
-            Vec3::ZERO,
-            Arc::new(Material::default()),
-        ))
+        true
     }
 
     pub fn compare(&self, other: &Self, axis: usize) -> Ordering {

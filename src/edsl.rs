@@ -168,12 +168,13 @@ impl Edsl {
         *t = mat * *t;
     }
 
-    pub fn run(mut self) -> World {
-        let n = self.objects.0.len();
-        let nodes = Node::new(&mut self.objects, 0, n, 0);
+    pub fn run(self) -> World {
+        let indices: Vec<usize> = (0..self.objects.0.len()).collect();
+        let nodes = Node::new(&self.objects, indices, 0);
         World {
             camera: self.camera,
-            objects: nodes,
+            bvh_node: nodes,
+            objects: self.objects,
             lights: self.lights,
             ambient: self.ambient,
             attenuation: self.attenuation,

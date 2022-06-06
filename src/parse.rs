@@ -285,12 +285,13 @@ pub fn parse_scene<'a>(path: PathBuf) -> Result<World> {
             _ => continue,
         }
     }
-    let n = objects.0.len();
-    let nodes = Node::new(&mut objects, 0, n, 0);
+    let indices: Vec<usize> = (0..objects.0.len()).collect();
+    let nodes = Node::new(&objects, indices, 0);
 
     Ok(World {
         camera,
-        objects: nodes,
+        bvh_node: nodes,
+        objects,
         lights,
         ambient,
         attenuation,
