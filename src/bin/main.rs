@@ -11,6 +11,7 @@ pub fn main() {
         "/Users/jeffreyrosenbluth/Develop/ucsd168/testscenes/scene7.test",
     ))
     .unwrap();
+    println!("World loaded");
     // let world = scene_1();
     let data = render(&world);
     write_png(

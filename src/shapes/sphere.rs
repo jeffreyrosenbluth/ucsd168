@@ -1,7 +1,8 @@
+use crate::aabb::Aabb;
 use crate::geom::{dot, Point3, Ray};
 use crate::material::Material;
 use crate::object::Hit;
-use glam::Mat4;
+use glam::{vec3, Mat4};
 use std::sync::Arc;
 
 #[derive(Debug, Clone)]
@@ -11,6 +12,7 @@ pub struct Sphere {
     pub material: Arc<Material>,
     pub transform: Mat4,
     pub inv_transform: Mat4,
+    pub bounding_box: Aabb,
 }
 
 impl Sphere {
@@ -22,6 +24,7 @@ impl Sphere {
             material,
             transform,
             inv_transform,
+            bounding_box: Self::bounding_box(radius),
         }
     }
 
@@ -46,12 +49,22 @@ impl Sphere {
             };
         }
         let p = r.at(root);
-        let n = self.inv_transform.transpose().transform_vector3(p - self.center);
+        let n = self
+            .inv_transform
+            .transpose()
+            .transform_vector3(p - self.center);
         Some(Hit::new(
             self.transform.transform_point3(p),
             root,
             n.normalize(),
             self.material.clone(),
         ))
+    }
+
+    pub fn bounding_box(radius: f32) -> Aabb {
+        Aabb::new(
+            vec3(-radius, -radius, -radius),
+            vec3(radius, radius, radius),
+        )
     }
 }

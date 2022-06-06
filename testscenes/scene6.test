@@ -48,17 +48,17 @@ pushTransform
 translate 0 0 -3
 rotate 0 1 0 60
 scale 10 10 1
-diffuse 1 0 0
+diffuse 0.7 0 0
 tri 0 1 2
 tri 0 2 3
 popTransform
 
-#green
+#blue
 pushTransform
 translate 0 0 -3
 rotate 0 1 0 -60
 scale 10 10 1
-diffuse 0 1 0
+diffuse 0.1 0 .72
 tri 0 1 2
 tri 0 2 3
 popTransform
@@ -122,7 +122,7 @@ sphere 0 0 0 1
 popTransform
 
 #sphere4
-diffuse 0.7 0.5 0.2
+diffuse 0.2 0.5 0.7
 specular 0.2 0.2 0.2
 pushTransform
 translate 0.5 -0.5 -2

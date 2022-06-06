@@ -1,7 +1,8 @@
+use crate::aabb::Aabb;
 use crate::geom::{cross, dot, Point3, Ray};
 use crate::material::Material;
 use crate::object::Hit;
-use glam::Mat4;
+use glam::{vec3, Mat4};
 use std::sync::Arc;
 
 #[derive(Debug, Clone)]
@@ -12,6 +13,7 @@ pub struct Triangle {
     pub material: Arc<Material>,
     pub transform: Mat4,
     pub inv_transform: Mat4,
+    pub bounding_box: Aabb,
 }
 
 impl Triangle {
@@ -30,6 +32,7 @@ impl Triangle {
             material,
             transform,
             inv_transform,
+            bounding_box: Self::bounding_box(vertex1, vertex2, vertex3),
         }
     }
 
@@ -53,7 +56,10 @@ impl Triangle {
             None
         } else {
             let p = w1 * self.vertex1 + w2 * self.vertex2 + w3 * self.vertex3;
-            let n = self.inv_transform.transpose().transform_vector3(cross(e1, e2)); 
+            let n = self
+                .inv_transform
+                .transpose()
+                .transform_vector3(cross(e1, e2));
             Some(Hit::new(
                 self.transform.transform_point3(p),
                 t,
@@ -61,5 +67,15 @@ impl Triangle {
                 self.material.clone(),
             ))
         }
+    }
+
+    pub fn bounding_box(v1: Point3, v2: Point3, v3: Point3) -> Aabb {
+        let x_min = v1.x.min(v2.x).min(v3.x);
+        let x_max = v1.x.max(v2.x).max(v3.x);
+        let y_min = v1.y.min(v2.y).min(v3.y);
+        let y_max = v1.y.max(v2.y).max(v3.y);
+        let z_min = v1.z.min(v2.z).min(v3.z);
+        let z_max = v1.z.max(v2.z).max(v3.z);
+        Aabb::new(vec3(x_min, y_min, z_min), vec3(x_max, y_max, z_max))
     }
 }

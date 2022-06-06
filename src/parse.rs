@@ -1,3 +1,4 @@
+use crate::bvh::Node;
 use crate::camera::*;
 use crate::geom::*;
 use crate::light::*;
@@ -12,7 +13,7 @@ use std::fs;
 use std::path::PathBuf;
 use std::sync::Arc;
 
-pub fn parse_scene(path: PathBuf) -> Result<World> {
+pub fn parse_scene<'a>(path: PathBuf) -> Result<World> {
     let mut w = 0.0;
     let mut h = 0.0;
     let mut ambient = BLACK;
@@ -284,10 +285,12 @@ pub fn parse_scene(path: PathBuf) -> Result<World> {
             _ => continue,
         }
     }
+    let n = objects.0.len();
+    let nodes = Node::new(&mut objects, 0, n, 0);
 
     Ok(World {
         camera,
-        objects,
+        objects: nodes,
         lights,
         ambient,
         attenuation,

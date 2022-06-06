@@ -1,3 +1,4 @@
+use crate::bvh::*;
 use crate::camera::*;
 use crate::geom::*;
 use crate::light::*;
@@ -167,10 +168,12 @@ impl Edsl {
         *t = mat * *t;
     }
 
-    pub fn run(self) -> World {
+    pub fn run(mut self) -> World {
+        let n = self.objects.0.len();
+        let nodes = Node::new(&mut self.objects, 0, n, 0);
         World {
             camera: self.camera,
-            objects: self.objects,
+            objects: nodes,
             lights: self.lights,
             ambient: self.ambient,
             attenuation: self.attenuation,

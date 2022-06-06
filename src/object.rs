@@ -1,8 +1,10 @@
+use crate::aabb::{surrounding_box, Aabb};
 use crate::geom::{Point3, Ray};
 use crate::material::Material;
 use crate::shapes::sphere::Sphere;
 use crate::shapes::triangle::Triangle;
 use glam::Vec3;
+use std::cmp::Ordering;
 use std::sync::Arc;
 
 #[derive(Debug, Clone)]
@@ -24,7 +26,7 @@ impl Hit {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Shape {
     Sphere(Sphere),
     Triangle(Triangle),
@@ -37,9 +39,28 @@ impl Shape {
             Shape::Triangle(t) => t.hit(ray, t_min, t_max),
         }
     }
+
+    pub fn bounding_box(&self) -> Aabb {
+        match self {
+            Shape::Sphere(s) => s.bounding_box,
+            Shape::Triangle(t) => t.bounding_box,
+        }
+    }
+
+    pub fn compare(&self, other: &Self, axis: usize) -> Ordering {
+        let x = self.bounding_box().box_min[axis];
+        let y = other.bounding_box().box_min[axis];
+        if x < y {
+            Ordering::Less
+        } else if x > y {
+            Ordering::Greater
+        } else {
+            Ordering::Equal
+        }
+    }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Objects(pub Vec<Shape>);
 
 impl Objects {
@@ -53,6 +74,26 @@ impl Objects {
             }
         }
         rec
+    }
+
+    pub fn bounding_box(&self) -> Aabb {
+        let a = self.0[0].bounding_box();
+        self.0.iter().fold(a, |acc, o| {
+            let b = o.bounding_box();
+            surrounding_box(acc, b)
+        })
+    }
+
+    pub fn compare(&self, other: &Self, axis: usize) -> Ordering {
+        let x = self.bounding_box().box_min[axis];
+        let y = other.bounding_box().box_min[axis];
+        if x < y {
+            Ordering::Less
+        } else if x > y {
+            Ordering::Greater
+        } else {
+            Ordering::Equal
+        }
     }
 }
 
